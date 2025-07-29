@@ -13,6 +13,6 @@ export class Contact {
     @Column({type: "varchar", length: 11})
     number: string
 
-    @ManyToOne(() => User, user => user.contacts)
+    @ManyToOne(() => User, user => user.contacts, {onDelete: "CASCADE"})
     user: User
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { PaginationDto } from '../utils/global-dtos/pagination.dto';
 
 @Injectable()
 export class UserService {
@@ -40,28 +41,63 @@ export class UserService {
     };
   }
 
-  findAll() {
-    return this.userRepository.find({
-      relations: ["contacts"] , 
+  async findAll(pagination: PaginationDto) {
+
+    const {size = 10, page = 1 } = pagination
+
+    const skip = (page - 1) * size;
+
+    return await this.userRepository.find({
+      relations: ["contacts"],
       select: {
         id: true,
         email: true,
         cpf: true,
         birthday: true,
         updateAt: true,
-      }
+      },
+      skip,
+      take: pagination.size
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    
+    const user = await this.userRepository.findOne({
+      relations: ["contacts"],
+      where: {
+        id
+      },
+    })
+
+    if(!user){
+      throw new NotFoundException(`user ${id} not found!`)
+    }
+
+    return user
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepository.preload({
+      id,
+      ...updateUserDto
+    })
+
+    if (!user) {
+      throw new NotFoundException(`User ${id} not found!`);
+    }
+    await this.userRepository.save(user);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id
+      }
+    })
+    if (!user) throw new NotFoundException(`User ${id} not found!`)
+    
+    await this.userRepository.remove(user)
+
   }
 }
