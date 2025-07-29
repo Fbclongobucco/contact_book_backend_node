@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query 
 import { ContactService } from './contact.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
-import { PaginationDto } from '../utils/global-dtos/pagination.dto';
+import { PaginationDto } from 'src/utils/global-dtos/pagination.dto';
 
 @Controller('contact')
 export class ContactController {
@@ -31,5 +31,10 @@ export class ContactController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.contactService.remove(id);
+  }
+
+  @Get("user/:id")
+  getAllcontactsByUserId(@Param('id', ParseIntPipe) id: number, @Query() pagination: PaginationDto){
+    return this.contactService.findAllByUser(id, pagination)
   }
 }

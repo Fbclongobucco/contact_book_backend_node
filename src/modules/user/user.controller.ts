@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe 
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PaginationDto } from '../utils/global-dtos/pagination.dto';
+import { PaginationDto } from 'src/utils/global-dtos/pagination.dto';
 
 @Controller('user')
 export class UserController {

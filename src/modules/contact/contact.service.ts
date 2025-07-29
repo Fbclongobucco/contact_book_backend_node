@@ -4,8 +4,8 @@ import { UpdateContactDto } from './dto/update-contact.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Contact } from './entities/contact.entity';
 import { Repository } from 'typeorm';
-import { UserService } from '../user/user.service';
-import { PaginationDto } from '../utils/global-dtos/pagination.dto';
+import { PaginationDto } from 'src/utils/global-dtos/pagination.dto';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class ContactService {
@@ -13,12 +13,18 @@ export class ContactService {
   constructor(
     @InjectRepository(Contact)
     private readonly contactRepository: Repository<Contact>,
-    private readonly userService: UserService
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) { }
 
   async create(id: number, createContactDto: CreateContactDto) {
 
-    const user = await this.userService.findOne(id)
+    const user = await this.userRepository.findOne({
+      where: {
+        id
+      }
+    })
 
     if (!user) {
       throw new NotFoundException(`user ${id} not found!`)
@@ -67,6 +73,27 @@ export class ContactService {
 
   }
 
+  async findAllByUser(id: number, pagination: PaginationDto) {
+
+    const { size = 10, page = 1 } = pagination
+
+    const skip = (page - 1) * size;
+
+    const contacts = await this.contactRepository.find({
+      where: {
+        user: {
+          id
+        },
+      }, 
+      skip,
+      take: size
+    })
+
+    return contacts
+
+
+  }
+
   async findOne(id: number) {
 
     const contact = await this.contactRepository.findOne({
@@ -109,6 +136,5 @@ export class ContactService {
     }
 
     await this.contactRepository.remove(contact)
-
   }
 }

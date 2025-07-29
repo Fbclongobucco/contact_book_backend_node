@@ -6,14 +6,13 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { PaginationDto } from '../utils/global-dtos/pagination.dto';
-
+import { PaginationDto } from 'src/utils/global-dtos/pagination.dto';
 @Injectable()
 export class UserService {
 
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
   ) { }
 
   async create(createUserDto: CreateUserDto) {
@@ -35,7 +34,7 @@ export class UserService {
       name,
       email,
       cpf,
-      birthday: format(birthday, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
+      birthday: format(birthday, "dd/MM/yyyy", { locale: ptBR }),
       createAt: format(createAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
       updateAt: format(updateAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
     };
@@ -43,12 +42,11 @@ export class UserService {
 
   async findAll(pagination: PaginationDto) {
 
-    const {size = 10, page = 1 } = pagination
+    const { size = 10, page = 1 } = pagination
 
     const skip = (page - 1) * size;
 
     return await this.userRepository.find({
-      relations: ["contacts"],
       select: {
         id: true,
         email: true,
@@ -62,19 +60,27 @@ export class UserService {
   }
 
   async findOne(id: number) {
-    
+
     const user = await this.userRepository.findOne({
-      relations: ["contacts"],
+      
       where: {
         id
       },
     })
 
-    if(!user){
+    if (!user) {
       throw new NotFoundException(`user ${id} not found!`)
     }
 
-    return user
+    return {
+      id: user.id,
+      name: user.name,
+      cpf: user.cpf,
+      email: user.email,
+      birthday: format(user.birthday, "dd/MM/yyyy", { locale: ptBR }),
+      createAt: format(user.createAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
+      updateAt: format(user.updateAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
+    }
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
@@ -96,8 +102,10 @@ export class UserService {
       }
     })
     if (!user) throw new NotFoundException(`User ${id} not found!`)
-    
+
     await this.userRepository.remove(user)
 
   }
+
 }
+
