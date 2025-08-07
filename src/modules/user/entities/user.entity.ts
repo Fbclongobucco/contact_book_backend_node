@@ -1,6 +1,7 @@
 import { IsEmail } from "class-validator"
 import { Contact } from "src/modules/contact/entities/contact.entity"
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { Roles } from "../enums/roles.enum"
 
 @Entity()
 export class User {
@@ -32,4 +33,10 @@ export class User {
 
     @OneToMany(() => Contact, contacts => contacts.user)
     contacts: Contact[]
+
+    @Column({default: true})
+    active: boolean
+
+    @Column({type: "simple-array", default: []})
+    role: Roles[]
 }
