@@ -4,6 +4,7 @@ import { UserModule } from './modules/user/user.module';
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule } from "@nestjs/config";
 import { AuthModule } from './modules/auth/auth.module';
+import { AccountModule } from './modules/account/account.module';
 
 @Module({
     imports: [UserModule, ContactModule, ConfigModule.forRoot(), TypeOrmModule.forRoot({
@@ -15,6 +16,6 @@ import { AuthModule } from './modules/auth/auth.module';
         database: process.env.DATABASE_DATABASE,
         autoLoadEntities: Boolean(process.env.DATABASE_AUTOLOADENTITIES),
         synchronize: Boolean(process.env.DATABASE_SYNCHRONIZE)
-    }), AuthModule]
+    }), AuthModule, AccountModule]
 })
 export class AppModule{}

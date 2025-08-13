@@ -11,6 +11,7 @@ import { HashingService } from '../auth/hashing/hashing.service';
 import { TokenPayloadDto } from '../auth/dto/token.payload.dto';
 import { Roles } from './enums/roles.enum';
 import { UpdateUserRoleDto } from './dto/update-user.role.dto';
+
 @Injectable()
 export class UserService {
 
@@ -38,7 +39,7 @@ export class UserService {
 
 
 
-      const { id, name, email, cpf, birthday, createAt, updateAt } = await this.userRepository.save(user)
+      const { id, name, email, cpf, birthday, createdAt, updatedAt } = await this.userRepository.save(user)
 
       return {
         id,
@@ -46,8 +47,8 @@ export class UserService {
         email,
         cpf,
         birthday: format(birthday, "dd/MM/yyyy", { locale: ptBR }),
-        createAt: format(createAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
-        updateAt: format(updateAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
+        createAt: format(createdAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
+        updateAt: format(updatedAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
       };
     } catch (error) {
       
@@ -73,8 +74,8 @@ export class UserService {
         email: true,
         cpf: true,
         birthday: true,
-        createAt: true,
-        updateAt: true,
+        createdAt: true,
+        updatedAt: true,
       },
       skip,
       take: pagination.size
@@ -107,8 +108,8 @@ export class UserService {
       cpf: user.cpf,
       email: user.email,
       birthday: format(user.birthday, "dd/MM/yyyy", { locale: ptBR }),
-      createAt: format(user.createAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
-      updateAt: format(user.updateAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
+      createAt: format(user.createdAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
+      updateAt: format(user.updatedAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
     }
   }
 

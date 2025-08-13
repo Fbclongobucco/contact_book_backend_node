@@ -26,10 +26,10 @@ export class User {
     birthday: Date
 
     @CreateDateColumn()
-    createAt: Date
+    createdAt: Date
 
     @UpdateDateColumn()
-    updateAt: Date
+    updatedAt: Date
 
     @OneToMany(() => Contact, contacts => contacts.user)
     contacts: Contact[]

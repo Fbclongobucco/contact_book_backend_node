@@ -8,10 +8,11 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { Roles } from "./enums/roles.enum";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ConflictException, ForbiddenException, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, NotFoundException } from "@nestjs/common";
 import { PaginationDto } from "src/utils/global-dtos/pagination.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { TokenPayloadDto } from "../auth/dto/token.payload.dto";
+import { UpdateUserRoleDto } from "./dto/update-user.role.dto";
 
 describe("UserSevice", () => {
 
@@ -38,7 +39,8 @@ describe("UserSevice", () => {
               findOne: jest.fn(),
               find: jest.fn(),
               preload: jest.fn(),
-              remove: jest.fn()
+              remove: jest.fn(),
+              findOneBy: jest.fn()
             }
           }
         ]
@@ -77,8 +79,8 @@ describe("UserSevice", () => {
         password: hashPassord,
         cpf: createUserDto.cpf,
         birthday: createUserDto.birthday,
-        createAt: new Date(),
-        updateAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
         role: [Roles.BASIC],
         contacts: [],
         active: true
@@ -111,8 +113,8 @@ describe("UserSevice", () => {
         email: newUser.email,
         cpf: newUser.cpf,
         birthday: format(newUser.birthday, "dd/MM/yyyy", { locale: ptBR }),
-        createAt: format(newUser.createAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
-        updateAt: format(newUser.updateAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
+        createAt: format(newUser.createdAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
+        updateAt: format(newUser.updatedAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
       });
 
     })
@@ -147,8 +149,8 @@ describe("UserSevice", () => {
         password: "12345678",
         cpf: "12345678912",
         birthday: new Date(1988, 11, 7),
-        createAt: new Date(),
-        updateAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
         role: [Roles.BASIC],
         contacts: [],
         active: true
@@ -166,8 +168,8 @@ describe("UserSevice", () => {
         cpf: user.cpf,
         email: user.email,
         birthday: format(user.birthday, "dd/MM/yyyy", { locale: ptBR }),
-        createAt: format(user.createAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
-        updateAt: format(user.updateAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
+        createAt: format(user.createdAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
+        updateAt: format(user.updatedAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
       })
     })
 
@@ -193,8 +195,8 @@ describe("UserSevice", () => {
           email: "longobuco@gmail.com",
           cpf: "12345678912",
           birthday: new Date(1988, 11, 8),
-          createAt: new Date("2025-01-01T10:00:00Z"),
-          updateAt: new Date("2025-01-02T10:00:00Z"),
+          createdAt: new Date("2025-01-01T10:00:00Z"),
+          updatedAt: new Date("2025-01-02T10:00:00Z"),
         } as User,
         {
           id: 2,
@@ -202,8 +204,8 @@ describe("UserSevice", () => {
           email: "maria@gmail.com",
           cpf: "98765432100",
           birthday: new Date(1990, 4, 20),
-          createAt: new Date("2025-01-03T10:00:00Z"),
-          updateAt: new Date("2025-01-04T10:00:00Z"),
+          createdAt: new Date("2025-01-03T10:00:00Z"),
+          updatedAt: new Date("2025-01-04T10:00:00Z"),
         } as User,
       ];
 
@@ -310,8 +312,8 @@ describe("UserSevice", () => {
       password: "12345678",
       cpf: "12345678912",
       birthday: new Date(1988, 11, 7),
-      createAt: new Date(),
-      updateAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
       role: [Roles.BASIC],
       contacts: [],
       active: true,
@@ -338,7 +340,7 @@ describe("UserSevice", () => {
     });
 
     it("should throw ForbiddenException if user is not authorized", async () => {
-      const unauthorizedUser = { ...user, id: 2 }; 
+      const unauthorizedUser = { ...user, id: 2 };
 
       jest.spyOn(userRepository, "findOne").mockResolvedValue(unauthorizedUser);
 
@@ -350,6 +352,73 @@ describe("UserSevice", () => {
     });
   });
 
+  describe("setRole", () => {
+  const tokenPayload = {
+    sub: 1,
+    email: "user@test.com",
+    iat: 1234567890,
+    exp: 1234569999,
+    aud: "test-audience",
+    iss: "test-issuer",
+  };
 
+  it("should throw NotFoundException if user does not exist", async () => {
+    jest.spyOn(userRepository, "findOneBy").mockResolvedValue(null);
+
+    await expect(
+      userService.setRole(1, { role: Roles.ADMIN }, tokenPayload)
+    ).rejects.toThrow(new NotFoundException(`User 1 not found!`));
+
+    expect(userRepository.findOneBy).toHaveBeenCalledWith({ id: 1 });
+    expect(userRepository.save).not.toHaveBeenCalled();
+  });
+
+  it("should throw BadRequestException if role is invalid", async () => {
+    const mockUser = { id: 1, role: [Roles.BASIC] } as any;
+    jest.spyOn(userRepository, "findOneBy").mockResolvedValue(mockUser);
+
+    await expect(
+      userService.setRole(1, { role: "INVALID_ROLE" as any }, tokenPayload)
+    ).rejects.toThrow(new BadRequestException("Invalid role!"));
+
+    expect(userRepository.save).not.toHaveBeenCalled();
+  });
+
+  it("should set role to BASIC", async () => {
+    const mockUser = { id: 1, role: [] } as any;
+    jest.spyOn(userRepository, "findOneBy").mockResolvedValue(mockUser);
+    jest.spyOn(userRepository, "save").mockResolvedValue(mockUser);
+
+    const dto: UpdateUserRoleDto = { role: Roles.BASIC };
+    await userService.setRole(1, dto, tokenPayload);
+
+    expect(mockUser.role).toEqual([Roles.BASIC]);
+    expect(userRepository.save).toHaveBeenCalledWith(mockUser);
+  });
+
+  it("should set role to BASIC and ADMIN", async () => {
+    const mockUser = { id: 1, role: [] } as any;
+    jest.spyOn(userRepository, "findOneBy").mockResolvedValue(mockUser);
+    jest.spyOn(userRepository, "save").mockResolvedValue(mockUser);
+
+    const dto: UpdateUserRoleDto = { role: Roles.ADMIN };
+    await userService.setRole(1, dto, tokenPayload);
+
+    expect(mockUser.role).toEqual([Roles.BASIC, Roles.ADMIN]);
+    expect(userRepository.save).toHaveBeenCalledWith(mockUser);
+  });
+
+  it("should throw BadRequestException for unsupported role in switch", async () => {
+    const mockUser = { id: 1, role: [] } as any;
+    jest.spyOn(userRepository, "findOneBy").mockResolvedValue(mockUser);
+
+    const customRole = "SUPER_ADMIN" as any;
+    jest.spyOn(Object, "values").mockReturnValue([Roles.BASIC, Roles.ADMIN, customRole]);
+
+    await expect(
+      userService.setRole(1, { role: customRole }, tokenPayload)
+    ).rejects.toThrow(new BadRequestException("Unsupported role!"));
+  });
+});
 
 })
