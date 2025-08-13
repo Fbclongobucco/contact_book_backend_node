@@ -6,7 +6,7 @@ import { ConfigModule } from "@nestjs/config";
 import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
-    imports: [UserModule, ContactModule, ConfigModule.forRoot() ,TypeOrmModule.forRoot({
+    imports: [UserModule, ContactModule, ConfigModule.forRoot(), TypeOrmModule.forRoot({
         type: process.env.DATABASE_TYPE as "postgres",
         host: process.env.DATABASE_HOST,
         port: Number(process.env.DATABASE_PORT),

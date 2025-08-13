@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -22,31 +22,41 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
 
-    const passwordHash = await this.hashingService.hash(createUserDto.password)
+    try {
+      const passwordHash = await this.hashingService.hash(createUserDto.password)
 
-    const newUser = {
-      name: createUserDto.name,
-      email: createUserDto.email,
-      cpf: createUserDto.cpf,
-      password: passwordHash,
-      birthday: createUserDto.birthday,
-      role: [Roles.BASIC]
+      const newUser = {
+        name: createUserDto.name,
+        email: createUserDto.email,
+        cpf: createUserDto.cpf,
+        password: passwordHash,
+        birthday: createUserDto.birthday,
+        role: [Roles.BASIC]
+      }
+
+      const user = this.userRepository.create(newUser)
+
+
+
+      const { id, name, email, cpf, birthday, createAt, updateAt } = await this.userRepository.save(user)
+
+      return {
+        id,
+        name,
+        email,
+        cpf,
+        birthday: format(birthday, "dd/MM/yyyy", { locale: ptBR }),
+        createAt: format(createAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
+        updateAt: format(updateAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
+      };
+    } catch (error) {
+      
+      if (error.code === '23505') {
+        throw new ConflictException("emai already exists!")
+      }
+
+      throw error
     }
-
-    const user = this.userRepository.create(newUser)
-
-
-    const { id, name, email, cpf, birthday, createAt, updateAt } = await this.userRepository.save(user)
-
-    return {
-      id,
-      name,
-      email,
-      cpf,
-      birthday: format(birthday, "dd/MM/yyyy", { locale: ptBR }),
-      createAt: format(createAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
-      updateAt: format(updateAt, "dd/MM/yyyy : HH:mm", { locale: ptBR }),
-    };
   }
 
   async findAll(pagination: PaginationDto) {
