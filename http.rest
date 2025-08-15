@@ -1,0 +1,57 @@
+@baseUrl = http://192.168.122.107/contact-book
+@token = {{autenticate.response.body.accessToken}}
+
+###
+POST {{baseUrl}}/user
+Content-Type: application/json
+
+{
+    "name": "Vanilce de Fatima Longo Bucco Pinheiro",
+    "cpf": "42565654243",
+    "email": "vanilongobucco@gmail.com",
+    "password": "12345897897",
+    "birthday": "1969-2-20"
+}
+
+###
+# @name autenticate
+POST {{baseUrl}}/auth
+Content-Type: application/json
+
+{
+  "email": "tetelongobucco@gmail.com",
+  "password": "1234567890"
+}
+
+###
+GET {{baseUrl}}/user/1
+Authorization: Bearer {{token}}
+
+
+###
+GET {{baseUrl}}/user
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/contact/user/2
+Authorization: Bearer {{token}}
+
+
+###
+POST  {{baseUrl}}/contact/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name":"Fabrici",
+    "number":"21969789088"
+}
+
+###
+PATCH   {{baseUrl}}/contact/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{   
+    "name":"Fabrício irmão"
+}

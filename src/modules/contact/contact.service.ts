@@ -111,6 +111,8 @@ export class ContactService {
 
   async update(id: number, updateContactDto: UpdateContactDto) {
 
+    console.log(updateContactDto)
+
     const contact = await this.contactRepository.preload({
       id,
       ...updateContactDto

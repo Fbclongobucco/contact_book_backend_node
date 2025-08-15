@@ -1,4 +1,4 @@
-import { IsString, Length, Matches, Max, Min } from "class-validator"
+import { IsString, Length, Matches} from "class-validator"
 
 export class CreateContactDto {
 

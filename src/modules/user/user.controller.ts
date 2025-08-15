@@ -10,7 +10,6 @@ import { SetRolePolicy } from '../auth/decorators/route.policy.decorators';
 import { Roles } from './enums/roles.enum';
 import { RoutePolicyGuard } from '../auth/guards/auth.and.policy.guard';
 import { UpdateUserRoleDto } from './dto/update-user.role.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 
 @Controller('user')
@@ -25,7 +24,7 @@ export class UserController {
   @UseGuards(RoutePolicyGuard)
   @SetRolePolicy(Roles.ADMIN)
   @Get()
-  findAll(@Req() req: Request, @Query() pagination: PaginationDto) {
+  findAll(@Query() pagination: PaginationDto) {
     return this.userService.findAll(pagination);
   }
 
