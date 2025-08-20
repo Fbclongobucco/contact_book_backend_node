@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
 
 
 async function bootstrap() {
@@ -10,6 +11,13 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
     transform: true
   }))
+
+  app.use(helmet())
+
+  app.enableCors({
+    origin: "*"
+  })
+
   await app.listen(process.env.PORT ?? 3333);
 }
 bootstrap();

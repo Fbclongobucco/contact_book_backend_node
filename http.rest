@@ -1,4 +1,4 @@
-@baseUrl = http://192.168.122.107/contact-book
+@baseUrl = https://longobuccodev.com.br/api/contact-book
 @token = {{autenticate.response.body.accessToken}}
 
 ###
@@ -6,11 +6,11 @@ POST {{baseUrl}}/user
 Content-Type: application/json
 
 {
-    "name": "Vanilce de Fatima Longo Bucco Pinheiro",
-    "cpf": "42565654243",
-    "email": "vanilongobucco@gmail.com",
+    "name": "Fabrício Longo Bucco Pinheiro",
+    "cpf": "12356544324",
+    "email": "longobuccoofbc@gmail.com",
     "password": "12345897897",
-    "birthday": "1969-2-20"
+    "birthday": "1988-11-7"
 }
 
 ###
@@ -19,12 +19,12 @@ POST {{baseUrl}}/auth
 Content-Type: application/json
 
 {
-  "email": "tetelongobucco@gmail.com",
-  "password": "1234567890"
+  "email": "longobuccoofbc@gmail.com",
+  "password": "12345897897"
 }
 
 ###
-GET {{baseUrl}}/user/1
+GET {{baseUrl}}/user/2
 Authorization: Bearer {{token}}
 
 
@@ -53,5 +53,5 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {   
-    "name":"Fabrício irmão"
+    "name":"irmão"
 }
