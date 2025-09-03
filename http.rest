@@ -6,11 +6,11 @@ POST {{baseUrl}}/user
 Content-Type: application/json
 
 {
-    "name": "Fabrício Longo Bucco Pinheiro",
-    "cpf": "12356544324",
-    "email": "longobuccoofbc@gmail.com",
-    "password": "12345897897",
-    "birthday": "1988-11-7"
+    "name": "Stéfani Longo Bucco Pinheiro",
+    "cpf": "43536766543",
+    "email": "tetezinha@gmail.com",
+    "password": "1234589789",
+    "birthday": "1992-5-11"
 }
 
 ###
@@ -19,12 +19,12 @@ POST {{baseUrl}}/auth
 Content-Type: application/json
 
 {
-  "email": "longobuccoofbc@gmail.com",
-  "password": "12345897897"
+  "email": "tetezinha@gmail.com",
+  "password": "1234589789"
 }
 
 ###
-GET {{baseUrl}}/user/2
+GET {{baseUrl}}/user/3
 Authorization: Bearer {{token}}
 
 
@@ -33,7 +33,7 @@ GET {{baseUrl}}/user
 Authorization: Bearer {{token}}
 
 ###
-GET {{baseUrl}}/contact/user/2
+GET {{baseUrl}}/contact/user/3
 Authorization: Bearer {{token}}
 
 
@@ -43,12 +43,12 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "name":"Fabrici",
-    "number":"21969789088"
+    "name":"setio",
+    "number":"21989887783"
 }
 
 ###
-PATCH   {{baseUrl}}/contact/1
+PATCH   {{baseUrl}}/contact/3
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
