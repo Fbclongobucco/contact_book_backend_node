@@ -6,6 +6,7 @@ import { PaginationDto } from 'src/utils/global-dtos/pagination.dto';
 import { SetRolePolicy } from '../auth/decorators/route.policy.decorators';
 import { RoutePolicyGuard } from '../auth/guards/auth.and.policy.guard';
 import { Roles } from '../user/enums/roles.enum';
+import { SearchContactDto } from 'src/utils/global-dtos/searc-contact.dto';
 
 @Controller('contact')
 export class ContactController {
@@ -52,4 +53,13 @@ export class ContactController {
   getAllcontactsByUserId(@Param('id', ParseIntPipe) id: number, @Query() pagination: PaginationDto) {
     return this.contactService.findAllByUser(id, pagination)
   }
+
+  @Get("user/:id/search")
+  getContactByParam(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() searchDto: SearchContactDto
+  ) {
+    return this.contactService.searchByUser(id, searchDto.q, searchDto);
+  }
+
 }

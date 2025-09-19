@@ -15,7 +15,7 @@ export class User {
     @Column({type: "varchar", length: 11})
     cpf: string
 
-    @Column({type: "varchar", length: 150})
+    @Column({type: "varchar", length: 150, unique: true})
     @IsEmail()
     email: string
 

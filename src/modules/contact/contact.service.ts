@@ -84,7 +84,7 @@ export class ContactService {
         user: {
           id
         },
-      }, 
+      },
       skip,
       take: size
     })
@@ -138,5 +138,27 @@ export class ContactService {
     }
 
     await this.contactRepository.remove(contact)
+  }
+
+  async searchByUser(userId: number, query: string | undefined, pagination: PaginationDto) {
+    const { size = 10, page = 1 } = pagination;
+    const skip = (page - 1) * size;
+
+    const contacts = await this.contactRepository.createQueryBuilder("contact")
+      .leftJoinAndSelect("contact.user", "user")
+      .where("user.id = :userId", { userId })
+      .andWhere("(contact.name ILIKE :q)", { q: `%${query}%` })
+      .skip(skip)
+      .take(size)
+      .getMany();
+
+    return contacts.map(c => ({
+      id: c.id,
+      name: c.name,
+      number: c.number,
+      user: {
+        name: c.user.name
+      }
+    }));
   }
 }

@@ -1,4 +1,4 @@
-@baseUrl = https://longobuccodev.com.br/api/contact-book
+@baseUrl = http://localhost:3333
 @token = {{autenticate.response.body.accessToken}}
 
 ###
@@ -24,7 +24,7 @@ Content-Type: application/json
 }
 
 ###
-GET {{baseUrl}}/user/3
+GET {{baseUrl}}/user/2
 Authorization: Bearer {{token}}
 
 
@@ -33,7 +33,7 @@ GET {{baseUrl}}/user
 Authorization: Bearer {{token}}
 
 ###
-GET {{baseUrl}}/contact/user/3
+GET {{baseUrl}}/contact/user/2
 Authorization: Bearer {{token}}
 
 
@@ -55,3 +55,8 @@ Content-Type: application/json
 {   
     "name":"irmão"
 }
+
+###
+GET {{baseUrl}}/contact/user/2/search?q=8
+Authorization: Bearer {{token}}
+
